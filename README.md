@@ -1,2 +1,2 @@
-# polysim
+# pPOLYSIM
 Baseline for POLYSIM 2027 Challenge
