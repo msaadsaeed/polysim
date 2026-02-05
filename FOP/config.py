@@ -18,10 +18,10 @@ class ExperimentConfig:
     version: str = "v3"
     seen_lang: str = "English"
 
-    missing_modality = None
-    missing_ratio = 0.0
+    train_missing_modality = "face"
+    missing_ratio = 0.1 # 0.0 - 1.0
 
-    debug: bool = True
+    debug: bool = False
     log_level = logging.DEBUG if debug else logging.INFO
 
     early_stop: bool = True

@@ -9,6 +9,25 @@ from trainer import Trainer
 from evaluator import Evaluator
 from earlystop import EarlyStopping
 
+import os
+import json
+
+
+def save_checkpoint(model, optimizer, config, epoch, metric_value, save_path):
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    checkpoint = {
+        "epoch": epoch,
+        "metric": metric_value,
+        "early_stop_metric": config.early_stop_metric,
+        "model_state": model.state_dict(),
+        "optimizer_state": optimizer.state_dict() if optimizer else None,
+        "config": vars(config),  # full experiment snapshot
+    }
+
+    torch.save(checkpoint, save_path)
+
+
 def setup_logger(config):
     logger = logging.getLogger("Experiment")
     logger.setLevel(config.log_level)
@@ -25,8 +44,6 @@ def setup_logger(config):
 
 
 def make_loader(csv_path, config, shuffle=False, logger=None):
-    # if logger:
-    #     logger.info("Creating DataLoader for %s (shuffle=%s)", csv_path, shuffle)
 
     dataset = LoadData(
         csv_path=csv_path,
@@ -35,7 +52,7 @@ def make_loader(csv_path, config, shuffle=False, logger=None):
         modality="audiovisual",
     )
 
-    return DataLoader(
+    loader =  DataLoader(
         dataset,
         batch_size=config.batch_size,
         shuffle=shuffle,
@@ -43,6 +60,8 @@ def make_loader(csv_path, config, shuffle=False, logger=None):
         pin_memory=True,
         drop_last=False,
     )
+
+    return dataset, loader
 
 
 def main():
@@ -67,7 +86,7 @@ def main():
         config.seen_lang,
         config.resolved_num_classes,
         config.unseen_lang,
-        config.missing_modality,
+        config.train_missing_modality,
         config.missing_ratio,
     )
 
@@ -85,9 +104,9 @@ def main():
     # --------------------------------------------------
     # DataLoaders
     # --------------------------------------------------
-    train_loader = make_loader(train_csv, config, shuffle=True, logger=logger)
-    test_loader = make_loader(test_csv, config, shuffle=False, logger=logger)
-    unseen_loader = make_loader(unseen_csv, config, shuffle=False, logger=logger)
+    _, train_loader = make_loader(train_csv, config, shuffle=True, logger=logger)
+    test_dataset, _ = make_loader(test_csv, config, shuffle=False, logger=logger)
+    unseen_test_dataset, _ = make_loader(unseen_csv, config, shuffle=False, logger=logger)
 
     # --------------------------------------------------
     # Infer feature dimensions
@@ -122,6 +141,17 @@ def main():
     for alpha in config.alpha_list:
         logger.info("=== Training with alpha=%.3f ===", alpha)
 
+        best_metric = -float("inf")
+        best_epoch = -1
+
+        save_path = (
+            f"./checkpoints/"
+            f"{config.version}_"
+            f"{config.seen_lang}_"
+            f"alpha{alpha}_"
+            f"best.pt"
+        )
+
         early_stopper = EarlyStopping(
         patience=config.early_stop_patience,
         min_delta=config.early_stop_min_delta,
@@ -130,14 +160,27 @@ def main():
         for epoch in range(config.max_epochs):
             loss = trainer.train_epoch(train_loader, alpha)
 
-            acc_seen = evaluator.accuracy(test_loader)
-            acc_unseen = evaluator.accuracy(unseen_loader)
+            acc_seen = evaluator.accuracy(test_dataset)
+            acc_unseen = evaluator.accuracy(unseen_test_dataset)
 
             monitor_value = (
                 acc_seen
                 if config.early_stop_metric == "seen"
                 else acc_unseen
             )
+
+            if monitor_value > best_metric:
+                best_metric = monitor_value
+                best_epoch = epoch
+
+                save_checkpoint(
+                    model=model,
+                    optimizer=trainer.opt,
+                    config=config,
+                    epoch=epoch,
+                    metric_value=monitor_value,
+                    save_path=save_path,
+                )
 
             logger.info(
                 "[α=%.3f] Epoch %03d | Loss %.4f | Seen %.2f | Unseen %.2f",
@@ -151,8 +194,8 @@ def main():
             if config.early_stop:
                 if early_stopper.step(monitor_value):
                     logger.info(
-                        "Early stopping triggered at epoch %d",
-                        "(best %s accuracy = %0.2f)".
+                        "Early stopping triggered at epoch %d" \
+                        "(best %s accuracy = %0.2f)",
                         epoch,
                         config.early_stop_metric,
                         early_stopper.best_score,
