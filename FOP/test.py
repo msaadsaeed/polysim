@@ -1,10 +1,10 @@
 import torch
 import numpy as np
 
-from config import ExperimentConfig
-from featLoader import LoadData
+from utils.config import ExperimentConfig
+from utils.featLoader import LoadData
 from model import FOP
-from evaluator import Evaluator
+from utils.evaluator import Evaluator
 
 
 def apply_missing(face, audio, pct, modality, seed=0):
