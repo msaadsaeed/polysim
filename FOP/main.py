@@ -3,11 +3,11 @@ import torch
 from torch.utils.data import DataLoader
 
 from config import ExperimentConfig
-from featLoader import LoadData
+from utils.featLoader import LoadData
 from model import FOP
-from trainer import Trainer
-from evaluator import Evaluator
-from earlystop import EarlyStopping
+from utils.trainer import Trainer
+from utils.evaluator import Evaluator
+from utils.earlystop import EarlyStopping
 
 import os
 import json
