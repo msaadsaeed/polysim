@@ -1,45 +1,54 @@
 import torch
-import logging
-
 
 class Evaluator:
     def __init__(self, model, config):
         self.model = model
         self.config = config
 
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.logger.setLevel(config.log_level)
+        # Cache tensors (lazy init)
+        self._cached = {}
 
-        if not self.logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                "[%(levelname)s][%(name)s] %(message)s"
-            )
-            handler.setFormatter(formatter)
-            self.logger.addHandler(handler)
-
-    def accuracy(self, loader):
+    def _get_tensors(self, dataset):
         """
-        Compute accuracy for the given loader.
+        Cache tensors to avoid repeated torch.from_numpy calls.
+        """
+        key = id(dataset)
+        if key not in self._cached:
+            self._cached[key] = (
+                torch.from_numpy(dataset.face_feats).float(),
+                torch.from_numpy(dataset.audio_feats).float(),
+                torch.from_numpy(dataset.labels).long(),
+            )
+        return self._cached[key]
 
-        Missing-modality behavior is defined entirely by the dataset
-        via `config.missing_modality` and `config.missing_ratio`.
+    def accuracy_from_tensors(self, face, audio, labels):
+        self.model.eval()
+        with torch.no_grad():
+            _, logits, _, _ = self.model(face, audio)
+            preds = logits.argmax(dim=1)
+            correct = (preds == labels).sum().item()
+        return 100.0 * correct / labels.size(0)
+
+
+    def accuracy(self, dataset):
+        """
+        Vectorized accuracy computation (FAST).
+
+        Missing-modality behavior is defined by the dataset
+        or can be applied externally via tensor ops.
         """
         self.model.eval()
-        correct, total = 0, 0
+
+        face, audio, labels = self._get_tensors(dataset)
 
         with torch.no_grad():
-            for audio, face, labels in loader:
-                audio = audio.to(self.config.device, non_blocking=True)
-                face = face.to(self.config.device, non_blocking=True)
-                labels = labels.to(self.config.device, non_blocking=True)
+            face = face.to(self.config.device, non_blocking=True)
+            audio = audio.to(self.config.device, non_blocking=True)
+            labels = labels.to(self.config.device, non_blocking=True)
 
-                _, logits, _, _ = self.model(face, audio)
-                preds = logits.argmax(dim=1)
+            _, logits, _, _ = self.model(face, audio)
+            preds = logits.argmax(dim=1)
 
-                correct += (preds == labels).sum().item()
-                total += labels.size(0)
+            correct = (preds == labels).sum().item()
 
-        acc = 100.0 * correct / total
-
-        return acc
+        return 100.0 * correct / labels.size(0)

@@ -28,12 +28,32 @@ class Trainer:
             face = face.to(self.config.device, non_blocking=True)
             labels = labels.to(self.config.device, non_blocking=True)
 
+            # --------------------------------------------------
+            # TRAIN-TIME missing modality (batch-level)
+            # --------------------------------------------------
+            if (
+                self.config.train_missing_modality is not None
+                and self.config.missing_ratio > 0
+            ):
+                B = labels.size(0)
+                k = int(self.config.missing_ratio * B)
+
+                if k > 0:
+                    idx = torch.randperm(B, device=labels.device)[:k]
+
+                    if self.config.train_missing_modality == "audio":
+                        audio[idx] = 0
+                    elif self.config.train_missing_modality == "face":
+                        face[idx] = 0
+
             fused, logits, _, _ = self.model(face, audio)
 
             loss = (
                 self.ce(logits, labels)
                 + alpha * self.opl(fused, labels)
             )
+
+            # loss = self.ce(logits, labels)
 
             self.opt.zero_grad(set_to_none=True)
             loss.backward()
