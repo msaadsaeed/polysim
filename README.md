@@ -155,3 +155,32 @@ The goal of evaluation is to study:
 
 Participants must submit predictions for the test set in **CSV format**:
 
+## Reference 
+@inproceedings{saeed2022fusion,
+  title     = {Fusion and Orthogonal Projection for Improved Face-Voice Association},
+  author    = {Saeed, Muhammad Saad and
+               Khan, Muhammad Haris and
+               Nawaz, Shah and
+               Yousaf, Muhammad Haroon and
+               Del Bue, Alessio},
+  booktitle = {ICASSP 2022 -- IEEE International Conference on Acoustics, Speech and Signal Processing},
+  pages     = {7057--7061},
+  year      = {2022},
+  organization = {IEEE}
+}
+
+@inproceedings{nawaz2021cross,
+  title     = {Cross-Modal Speaker Verification and Recognition: A Multilingual Perspective},
+  author    = {Nawaz, Shah and
+               Saeed, Muhammad Saad and
+               Morerio, Pietro and
+               Mahmood, Arif and
+               Gallo, Ignazio and
+               Yousaf, Muhammad Haroon and
+               Del Bue, Alessio},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {1682--1691},
+  year      = {2021}
+}
+
+
