@@ -156,6 +156,8 @@ The goal of evaluation is to study:
 Participants must submit predictions for the test set in **CSV format**:
 
 ## Reference 
+
+```BibTeX
 @inproceedings{saeed2022fusion,
   title     = {Fusion and Orthogonal Projection for Improved Face-Voice Association},
   author    = {Saeed, Muhammad Saad and
@@ -182,5 +184,5 @@ Participants must submit predictions for the test set in **CSV format**:
   pages     = {1682--1691},
   year      = {2021}
 }
-
+```
 
