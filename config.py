@@ -11,20 +11,22 @@ class ExperimentConfig:
     batch_size: int = 32
     max_epochs: int = 300
     num_workers = 0
-    alpha_list: List[float] = (1.0,)
+    alpha_list: List[float] = (0.0,)
     embedding_dim: int = 512
 
-    model_type: str = "FOP"   # "fop" | "multibranch"
-    fusion: str = "concat"   # "linear" | "gated" | "concat"
-    
+    model_type: str = "FOP"   # "FOP" | "multibranch"
+    fusion: str = "linear"   # "linear" | "gated" | "concat"
+    audio_encoder = "ecappa_feats_path" #"ecappa_feats_path", "wavslmsv"
+    test_split = "test" # "test", "val"
+
     loss_face: float = 1.0
     loss_voice: float = 1.0
     loss_fusion: float = 1.0
 
-    version: str = "v3"
+    version: str = "v1"
     seen_lang: str = "English"
 
-    train_missing_modality = "voice" # "face", "voice", None
+    train_missing_modality = None # "face", "voice", None
     missing_ratio = 0.0 # 0.0 - 1.0
 
     debug: bool = False

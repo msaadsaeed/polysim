@@ -51,7 +51,7 @@ def make_loader(csv_path, config, shuffle=False, logger=None):
     dataset = LoadData(
         csv_path=csv_path,
         config=config,
-        audio_encoder="ecappa_feats_path",
+        audio_encoder=config.audio_encoder,
         modality="audiovisual",
     )
 
@@ -81,8 +81,7 @@ def main():
 
     logger.info("=== Experiment started ===")
     logger.info(
-        "Seed=%d | Device=%s | Model=%s | Fusion=%s | Version=%s | Train_Lang=%s \
-        \n#Classes=%d | UnSeen_Lang=%s | Missing=%s | Ratio=%.2f",
+        "Seed=%d | Device=%s | Model=%s | Fusion=%s | Version=%s | Train_Lang=%s #Classes=%d | UnSeen_Lang=%s | Missing=%s | Ratio=%.2f",
         config.seed,
         config.device,
         config.model_type,
@@ -99,8 +98,8 @@ def main():
     # CSV paths
     # --------------------------------------------------
     train_csv = f"./feature_tracker/{config.version}_train_{config.seen_lang}.csv"
-    test_csv = f"./feature_tracker/{config.version}_val_{config.seen_lang}.csv"
-    unseen_csv = f"./feature_tracker/{config.version}_val_{config.unseen_lang}.csv"
+    test_csv = f"./feature_tracker/{config.version}_{config.test_split}_{config.seen_lang}.csv"
+    unseen_csv = f"./feature_tracker/{config.version}_{config.test_split}_{config.unseen_lang}.csv"
 
     logger.info("Train CSV: %s", train_csv)
     logger.info("Test  CSV: %s", test_csv)
