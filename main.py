@@ -3,11 +3,14 @@ import torch
 from torch.utils.data import DataLoader
 
 from config import ExperimentConfig
+
 from utils.featLoader import LoadData
-from model import FOP
 from utils.trainer import Trainer
 from utils.evaluator import Evaluator
 from utils.earlystop import EarlyStopping
+
+from models.fop import FOP
+from models.multibranch import MultiBranchFOP
 
 import os
 import json
@@ -78,9 +81,11 @@ def main():
 
     logger.info("=== Experiment started ===")
     logger.info(
-        "Seed=%d | Device=%s | Fusion=%s | Version=%s | Train_Lang=%s | #Classes=%d | UnSeen_Lang=%s | Missing=%s | Ratio=%.2f",
+        "Seed=%d | Device=%s | Model=%s | Fusion=%s | Version=%s | Train_Lang=%s \
+        \n#Classes=%d | UnSeen_Lang=%s | Missing=%s | Ratio=%.2f",
         config.seed,
         config.device,
+        config.model_type,
         config.fusion,
         config.version,
         config.seen_lang,
@@ -94,8 +99,8 @@ def main():
     # CSV paths
     # --------------------------------------------------
     train_csv = f"./feature_tracker/{config.version}_train_{config.seen_lang}.csv"
-    test_csv = f"./feature_tracker/{config.version}_test_{config.seen_lang}.csv"
-    unseen_csv = f"./feature_tracker/{config.version}_test_{config.unseen_lang}.csv"
+    test_csv = f"./feature_tracker/{config.version}_val_{config.seen_lang}.csv"
+    unseen_csv = f"./feature_tracker/{config.version}_val_{config.unseen_lang}.csv"
 
     logger.info("Train CSV: %s", train_csv)
     logger.info("Test  CSV: %s", test_csv)
@@ -118,11 +123,24 @@ def main():
         face.shape[1],
     )
 
-    model = FOP(
-        config=config,
-        face_dim=face.shape[1],
-        voice_dim=audio.shape[1],
-    )
+    if config.model_type == "FOP":
+
+        model = FOP(
+            config=config,
+            face_dim=face.shape[1],
+            voice_dim=audio.shape[1],
+        )
+
+        # print(model)
+    
+    elif config.model_type == "multibranch":
+        model = MultiBranchFOP(
+            config=config,
+            face_dim=face.shape[1],
+            voice_dim=audio.shape[1]
+        )
+    else:
+        raise ValueError(f"Unknown model_type: {config.model_type}")
 
     logger.info(
         "Model initialized | Params=%.2fM",

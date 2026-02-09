@@ -1,5 +1,6 @@
 import torch
 
+
 class Evaluator:
     def __init__(self, model, config):
         self.model = model
@@ -8,6 +9,9 @@ class Evaluator:
         # Cache tensors (lazy init)
         self._cached = {}
 
+    # --------------------------------------------------
+    # Dataset → tensor cache
+    # --------------------------------------------------
     def _get_tensors(self, dataset):
         """
         Cache tensors to avoid repeated torch.from_numpy calls.
@@ -21,34 +25,74 @@ class Evaluator:
             )
         return self._cached[key]
 
-    def accuracy_from_tensors(self, face, audio, labels):
+    # --------------------------------------------------
+    # Core accuracy from tensors
+    # --------------------------------------------------
+    def accuracy_from_tensors(
+        self,
+        face,
+        audio,
+        labels,
+        head="fusion",   # "fusion" | "face" | "voice"
+    ):
+        """
+        Vectorized accuracy from tensors.
+
+        head:
+            - "fusion" (default)
+            - "face"
+            - "voice"
+        """
         self.model.eval()
+
         with torch.no_grad():
-            _, logits, _, _ = self.model(face, audio)
+            out = self.model(face, audio)
+
+            # ---------------------------
+            # MultiBranchFOP
+            # ---------------------------
+            if isinstance(out, dict):
+                if head == "fusion":
+                    logits = out["fusion_logits"]
+                elif head == "face":
+                    logits = out["face_logits"]
+                elif head == "voice":
+                    logits = out["voice_logits"]
+                else:
+                    raise ValueError(f"Unknown head: {head}")
+
+            # ---------------------------
+            # Baseline FOP
+            # ---------------------------
+            else:
+                _, logits, _, _ = out
+
             preds = logits.argmax(dim=1)
             correct = (preds == labels).sum().item()
+
         return 100.0 * correct / labels.size(0)
 
-
-    def accuracy(self, dataset):
+    # --------------------------------------------------
+    # Dataset-level accuracy
+    # --------------------------------------------------
+    def accuracy(self, dataset, head="fusion"):
         """
         Vectorized accuracy computation (FAST).
 
-        Missing-modality behavior is defined by the dataset
-        or can be applied externally via tensor ops.
+        head:
+            - "fusion" (default)
+            - "face"
+            - "voice" (only valid for MultiBranchFOP)
         """
-        self.model.eval()
-
         face, audio, labels = self._get_tensors(dataset)
 
-        with torch.no_grad():
-            face = face.to(self.config.device, non_blocking=True)
-            audio = audio.to(self.config.device, non_blocking=True)
-            labels = labels.to(self.config.device, non_blocking=True)
+        face = face.to(self.config.device, non_blocking=True)
+        audio = audio.to(self.config.device, non_blocking=True)
+        labels = labels.to(self.config.device, non_blocking=True)
 
-            _, logits, _, _ = self.model(face, audio)
-            preds = logits.argmax(dim=1)
-
-            correct = (preds == labels).sum().item()
-
-        return 100.0 * correct / labels.size(0)
+        return self.accuracy_from_tensors(
+            face,
+            audio,
+            labels,
+            head=head,
+        )
