@@ -10,23 +10,29 @@ class ExperimentConfig:
     lr: float = 1e-3
     batch_size: int = 32
     max_epochs: int = 300
-    num_workers = 8
+    num_workers = 0
     alpha_list: List[float] = (1.0,)
     embedding_dim: int = 512
-    fusion: str = "linear"   # linear | gated
+
+    model_type: str = "FOP"   # "fop" | "multibranch"
+    fusion: str = "concat"   # "linear" | "gated" | "concat"
     
+    loss_face: float = 1.0
+    loss_voice: float = 1.0
+    loss_fusion: float = 1.0
+
     version: str = "v3"
     seen_lang: str = "English"
 
-    train_missing_modality = "face"
-    missing_ratio = 0.1 # 0.0 - 1.0
+    train_missing_modality = "voice" # "face", "voice", None
+    missing_ratio = 0.0 # 0.0 - 1.0
 
     debug: bool = False
     log_level = logging.DEBUG if debug else logging.INFO
 
     early_stop: bool = True
     early_stop_patience: int = 10      # tolerance (epochs)
-    early_stop_min_delta: float = 0.2 # minimum improvement
+    early_stop_min_delta: float = 0.3 # minimum improvement
     early_stop_metric: str = "seen"    # "seen" | "unseen"
 
     @property

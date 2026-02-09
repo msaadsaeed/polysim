@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-from utils.config import ExperimentConfig
+from config import ExperimentConfig
 from utils.featLoader import LoadData
 from model import FOP
 from utils.evaluator import Evaluator
@@ -50,7 +50,7 @@ def sweep_missing(
 
     results = []
 
-    for pct in range(step, 101, step):
+    for pct in range(0, 101, step):
         face_m, audio_m = apply_missing(
             face, audio, pct, modality, seed
         )

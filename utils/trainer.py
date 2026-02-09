@@ -1,6 +1,7 @@
 import torch
 from tqdm import tqdm
-from losses import OrthogonalProjectionLoss
+from .losses import OrthogonalProjectionLoss
+
 
 class Trainer:
     def __init__(self, model, config):
@@ -9,13 +10,12 @@ class Trainer:
 
         self.ce = torch.nn.CrossEntropyLoss()
         self.opl = OrthogonalProjectionLoss()
-        self.opt = torch.optim.Adam(model.parameters(), lr=config.lr)
+        self.opt = torch.optim.Adam(self.model.parameters(), lr=config.lr)
 
     def train_epoch(self, loader, alpha, logger=None, epoch=None):
         self.model.train()
         total_loss = 0.0
 
-        # tqdm only if debug or explicitly enabled
         pbar = tqdm(
             loader,
             desc=f"Epoch {epoch}",
@@ -46,20 +46,47 @@ class Trainer:
                     elif self.config.train_missing_modality == "face":
                         face[idx] = 0
 
-            fused, logits, _, _ = self.model(face, audio)
+            # --------------------------------------------------
+            # Forward
+            # --------------------------------------------------
+            out = self.model(face, audio)
 
-            loss = (
-                self.ce(logits, labels)
-                + alpha * self.opl(fused, labels)
-            )
+            # --------------------------------------------------
+            # Losses
+            # --------------------------------------------------
+            if isinstance(out, dict):
+                # -------- MultiBranchFOP --------
+                loss_face = self.ce(out["face_logits"], labels)
+                loss_voice = self.ce(out["voice_logits"], labels)
+                loss_fusion = self.ce(out["fusion_logits"], labels)
 
-            # loss = self.ce(logits, labels)
+                loss = (
+                    self.config.loss_face * loss_face
+                    + self.config.loss_voice * loss_voice
+                    + self.config.loss_fusion * loss_fusion
+                )
 
+                # Optional OPL on fusion embedding
+                if alpha > 0:
+                    loss = loss + alpha * self.opl(
+                        out["fusion_embed"], labels
+                    )
+
+            else:
+                # -------- FOP (baseline) --------
+                fused, logits, _, _ = out
+                loss = self.ce(logits, labels)
+
+                if alpha > 0:
+                    loss = loss + alpha * self.opl(fused, labels)
+
+            # --------------------------------------------------
+            # Backprop
+            # --------------------------------------------------
             self.opt.zero_grad(set_to_none=True)
             loss.backward()
             self.opt.step()
 
             total_loss += loss.item()
 
-        avg_loss = total_loss / len(loader)
-        return avg_loss
+        return total_loss / len(loader)
