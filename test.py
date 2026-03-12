@@ -3,7 +3,7 @@ import numpy as np
 
 from config import ExperimentConfig
 from utils.featLoader import LoadData
-from model import FOP
+from models.fop import FOP
 from utils.evaluator import Evaluator
 
 
