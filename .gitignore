@@ -9,3 +9,5 @@ data/
 feature_tracker/
 features/
 data/
+randomize.py
+eval_submission.py
