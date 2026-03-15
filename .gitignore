@@ -2,3 +2,12 @@ __pycache__
 *.pt
 *.csv
 checkpoints/
+*.csv
+*.xlsx
+csv_files/
+data/
+feature_tracker/
+features/
+data/
+randomize.py
+eval_submission.py

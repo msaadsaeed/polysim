@@ -15,7 +15,6 @@ from models.multibranch import MultiBranchFOP
 import os
 import json
 
-
 def save_checkpoint(model, optimizer, config, epoch, metric_value, save_path):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
@@ -201,7 +200,7 @@ def main():
                 )
 
             logger.info(
-                "[α=%.3f] Epoch %03d | Loss %.4f | Seen %.2f | Unseen %.2f",
+                "[α=%.3f] Epoch %03d | Loss %.4f | Seen Val %.2f | Unseen Val %.2f",
                 alpha,
                 epoch,
                 loss,
