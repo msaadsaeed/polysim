@@ -21,8 +21,8 @@ class ExperimentConfig:
     loss_voice: float = 1.0
     loss_fusion: float = 1.0
 
-    version: str = "v3"
-    seen_lang: str = "German"
+    version: str = "v1"
+    seen_lang: str = "English"
 
     train_missing_modality = "None" # "face", "voice", None
     test_missing_modality = "face" # face, voice

@@ -25,9 +25,9 @@ KEY_LEN = 10
 
 SupportedLangs = Literal["English", "Urdu", "Hindi", "German"]
 
-split = "test"
+split = "val"
 version: Version = Version.V1
-train_lang: Lang = Lang.URDU
+test_lang: Lang = Lang.ENGLISH
 
 def build_dst_audio(row):
     src = row["audio_path"]
@@ -42,7 +42,7 @@ def build_dst_audio(row):
     idx = f"{row.name+1:05d}.wav"
 
     return os.path.join(
-        "./data",
+        f"./data/{split}/",
         version,
         modality,
         # identity,
@@ -64,7 +64,7 @@ def build_dst_face(row):
     idx = f"{row.name+1:05d}.jpg"
 
     return os.path.join(
-        "./data",
+        f"./data/{split}/",
         version,
         modality,
         # identity,
@@ -82,27 +82,19 @@ def build_dst_feats(row, src_col):
     idx = f"{row.name+1:05d}.npy"
     
     return os.path.join(
-        "./features",
+        f"./features/{split}",
         version,
         modality,
         lang,
         idx
         )
 
-test_lang_key: dict[tuple[Lang, Version], Lang] = {
-    (Lang.ENGLISH, Version.V1): Lang.URDU,
-    (Lang.ENGLISH, Version.V2): Lang.HINDI,
-    (Lang.ENGLISH, Version.V3): Lang.GERMAN,
-}
-
-test_lang: Lang = test_lang_key.get((train_lang, version), Lang.ENGLISH)
-
 path = "./feature_tracker/"
 data_root = "../"
 dst_dir = f"./{version.value}"
 dst_dir_feats = "./feats/"
 test_csv_tracker_path = os.path.join(path, 
-                    f"{version.value}_test_{test_lang.value}.csv")
+                    f"{version.value}_{split}_{test_lang.value}.csv")
 test_csv = pd.read_csv(test_csv_tracker_path)
 
 sub_dict = test_csv[["audio_path", "face_path", "identity", 
@@ -141,6 +133,7 @@ key_list = list(keys)
 
 sub_dict.insert(0, "key", key_list)
 
+to_remove = set()
 for row in sub_dict.itertuples(index=False):
     src_face = row.face_path
     src_audio = row.audio_path
@@ -158,13 +151,20 @@ for row in sub_dict.itertuples(index=False):
     os.makedirs(os.path.dirname(dst_audio_feat), exist_ok=True)
     os.makedirs(os.path.dirname(dst_face_feat), exist_ok=True)
     
-    shutil.copy2(src_face, dst_face)
-    shutil.copy2(src_audio, dst_audio)  
+    shutil.move(src_face, dst_face)
+    shutil.move(src_audio, dst_audio)  
+    shutil.move(src_audio_feat, dst_audio_feat)
+    shutil.move(src_face_feat, dst_face_feat)
     
-    shutil.copy2(src_audio_feat, dst_audio_feat)
-    shutil.copy2(src_face_feat, dst_face_feat)
+    to_remove.add(os.path.dirname(src_face))
+    to_remove.add(os.path.dirname(src_audio))
+    to_remove.add(os.path.dirname(src_audio_feat))
+    to_remove.add(os.path.dirname(src_face_feat))
 
-sub_dict.to_csv(f"{version.value}_{test_lang.value}_test_key_dict.csv",index=None)
+for rem in to_remove:
+    shutil.rmtree(rem)
+
+sub_dict.to_csv(f"{version.value}_{test_lang.value}_{split}_key_dict.csv",index=None)
 
 sub_dict["voices"] = sub_dict["dst_audio_path"].apply(
     lambda p: p.replace("\\", "/").replace("./data/", ""))
@@ -172,4 +172,4 @@ sub_dict["voices"] = sub_dict["dst_audio_path"].apply(
 sub_dict["faces"] = sub_dict["dst_face_path"].apply(
     lambda p: p.replace("\\", "/").replace("./data/", ""))
 
-sub_dict[["key", "voices", "faces"]].to_csv(f"{version.value}_{test_lang.value}.csv",index=None)
+sub_dict[["key", "voices", "faces"]].to_csv(f"{version.value}_{split}_{test_lang.value}.csv",index=None)

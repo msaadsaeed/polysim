@@ -4,6 +4,8 @@ __pycache__
 checkpoints/
 *.csv
 *.xlsx
+csv_files/
 data/
+feature_tracker/
 features/
-checkpoints/
+data/
