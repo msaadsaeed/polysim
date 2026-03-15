@@ -3,7 +3,7 @@ import numpy as np
 
 from config import ExperimentConfig
 from utils.featLoader import LoadData
-from model import FOP
+from models.fop import FOP
 from utils.evaluator import Evaluator
 
 
@@ -11,7 +11,7 @@ def apply_missing(face, audio, pct, modality, seed=0):
     """
     Zero out `pct`% of samples for the given modality.
     """
-    assert modality in ["audio", "face"]
+    assert modality in ["voice", "face"]
 
     N = face.shape[0]
     k = int((pct / 100.0) * N)
@@ -24,7 +24,7 @@ def apply_missing(face, audio, pct, modality, seed=0):
     face_m = face.clone()
     audio_m = audio.clone()
 
-    if modality == "audio":
+    if modality == "voice":
         audio_m[idx] = 0
     else:
         face_m[idx] = 0
@@ -56,7 +56,7 @@ def sweep_missing(
         )
 
         acc = evaluator.accuracy_from_tensors(
-            face, audio_m, labels
+            face_m, audio_m, labels
         )
 
         results.append((pct, acc))
@@ -107,7 +107,7 @@ def main():
         voice_dim=audio_dim,
     ).to(device)
 
-    checkpoint_path = "./checkpoints/v3_English_alpha1.0_best.pt"
+    checkpoint_path = f"./checkpoints/{config.version}_{config.seen_lang}_alpha{config.test_alpha}_best.pt"
     ckpt = torch.load(checkpoint_path, map_location=device)
 
     model.load_state_dict(ckpt["model_state"])
@@ -118,20 +118,20 @@ def main():
     # --------------------------------------------------
     # Missing-modality sweeps
     # --------------------------------------------------
-    print(f"\n=== Version: {config.version} | Seen language: {config.seen_lang} | AUDIO missing sweep ===")
+    print(f"\n=== Version: {config.version} | Seen language: {config.seen_lang} | {config.test_missing_modality.upper()} missing sweep ===")
     sweep_missing(
         evaluator,
         test_dataset,
-        modality="audio",
+        modality=f"{config.test_missing_modality}",
         step=5,
         seed=config.seed,
     )
 
-    print(f"\n=== Version: {config.version} | Unseen language {config.unseen_lang} | AUDIO missing sweep ===")
+    print(f"\n=== Version: {config.version} | Unseen language {config.unseen_lang} | {config.test_missing_modality.upper()} missing sweep ===")
     sweep_missing(
         evaluator,
         unseen_test_dataset,
-        modality="audio",
+        modality=f"{config.test_missing_modality}",
         step=5,
         seed=config.seed,
     )

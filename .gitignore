@@ -2,3 +2,8 @@ __pycache__
 *.pt
 *.csv
 checkpoints/
+*.csv
+*.xlsx
+data/
+features/
+checkpoints/
