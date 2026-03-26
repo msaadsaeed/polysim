@@ -153,7 +153,7 @@ The goal of evaluation is to study:
 
 ## Submission
 
-Participants must submit predictions for the test set in **CSV format**:
+Participants must submit a ZIP archive containing CSV files, one per language pair. To create the archive, run zip submission.zip *.csv from within the directory containing the submission files (do not zip the folder itself). Files must be named as follows:
 
 ## Reference 
 
