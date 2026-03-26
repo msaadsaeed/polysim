@@ -1,4 +1,4 @@
-# POLYSIM 2027 Challenge  
+# POLYSIM 2026 Grand Challenge  
 ## Polyglot Speaker Identification with Missing Modality
 
 <!--## $\textcolor{green}{Accepting \space Submissions!}$ -->
