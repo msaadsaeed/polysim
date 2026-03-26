@@ -13,7 +13,7 @@
 Baseline systems are provided to benchmark multimodal speaker classification under missing-modality and cross-lingual conditions.
 
 **Baselines include:**
-- [FOP]([https://arxiv.org/abs/2603.24569](https://arxiv.org/abs/2112.10483))
+- [FOP](https://arxiv.org/abs/2112.10483))
 
 ---
 
