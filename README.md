@@ -123,7 +123,7 @@ The dataset MavCeleb consists of **paired speech audio and face images/video fra
 - **Labels**: Speaker ID  
 
 ### Data Splits
-- Training set  
+- Training set - Raw data, features  
 - Dev set  (labels hidden)
 - Test set (labels hidden)  
 
