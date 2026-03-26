@@ -156,7 +156,8 @@ The goal of evaluation is to study:
 Participants must submit a ZIP archive containing CSV files, one per language pair. To create the archive, zip submission.zip *.csv from within the directory containing the submission files (do not zip the folder itself). Files must be named as follows:
 - submission_v1_<phase>_English_English.csv
 - submission_v1_<phase>_English_Urdu.csv
-  
+
+
 Where `<phase>` is val (dev) or test (eval). 
 
 ## Reference 
