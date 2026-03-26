@@ -115,7 +115,7 @@ The most challenging setting, combining:
 
 ### Overview
 
-The dataset [MavCeleb](TBD) consists of **paired speech audio and face images/video frames** collected from multiple speakers across **multiple languages**.
+The dataset MavCeleb consists of **paired speech audio and face images/video frames** collected from multiple speakers across **multiple languages**.
 
 ### Modalities
 - **Audio**: Speech segments  
