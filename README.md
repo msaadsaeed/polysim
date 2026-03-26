@@ -4,7 +4,7 @@
 <!--## $\textcolor{green}{Accepting \space Submissions!}$ -->
 
 [Challenge Webpage](https://mmosc.github.io/fame2027.github.io/index.html#home)  
-[Evaluation Plan](TBD)
+[Evaluation Plan](https://arxiv.org/abs/2603.24569)
 
 ---
 
