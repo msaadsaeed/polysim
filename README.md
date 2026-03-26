@@ -19,7 +19,7 @@ Baseline systems are provided to benchmark multimodal speaker classification und
 
 ## Task
 
-The POLYSIM 2027 challenge addresses **closed-set speaker classification** using **audio (voice)** and **visual (face)** modalities.
+The POLYSIM 2026 challenge addresses **closed-set speaker classification** using **audio (voice)** and **visual (face)** modalities.
 
 The goal is to classify a speaker’s identity from a given sample under the following real-world challenges:
 
