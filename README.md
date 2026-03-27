@@ -124,7 +124,7 @@ The dataset MavCeleb consists of **paired speech audio and face images/video fra
 
 ### Data Splits
 - Training set - [Raw data](https://drive.google.com/file/d/1bRFbL9jOcmauEMJlEN_-4DvbpL2SFwlz/view?usp=sharing), [features](https://drive.google.com/file/d/11gjdlJgRxWcoNU9h-xlD8W0171Q6nvAA/view?usp=sharing)  
-- Dev set  (labels hidden)
+- Dev set  (labels hidden) - [Raw data](https://drive.google.com/file/d/1JRkgFKUo0hVdnPaT8JsrSn06C1hl8g89/view?usp=sharing), [features](https://drive.google.com/file/d/19smDBY2fcvR-vXML2UjGrWc0XyfDO3-l/view?usp=sharing)
 - Test set (labels hidden)  
 
 ### Missing Modality Setup
