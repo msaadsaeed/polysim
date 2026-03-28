@@ -15,6 +15,13 @@ Baseline systems are provided to benchmark multimodal speaker classification und
 **Baselines include:**
 - [FOP](https://arxiv.org/abs/2112.10483)
 
+## Results Table
+
+| Configuration       | Phase    | P3 (Face-Audio Eng.) | P4 (Audio Eng.) | P5 (Face-Audio Urdu) | P6 (Audio Urdu) | Avg.  |
+|---------------------|----------|----------------------|-----------------|----------------------|-----------------|-------|
+| Face-Audio (Eng.)   | Progress | 97.44                | 37.75           | 98.48                | 31.70           | 66.34 |
+| Face-Audio (Eng.)   | Eval     | 98.82                | 52.53           | 98.27                | 43.87           | 73.37 |
+
 ---
 
 ## Task
