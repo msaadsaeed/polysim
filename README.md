@@ -166,8 +166,58 @@ Participants must submit a ZIP archive containing CSV files, one per language pa
 - submission_v1_<phase>_English_Urdu.csv
 ```
 
-
 Where `<phase>` is val (dev) or test (eval). 
+
+## Setup
+
+Create the environment using:
+
+```bash
+conda create -n polysim python=3.9.25
+conda activate polysim
+```
+
+Install the required PyTorch packages:
+
+```bash
+pip install torch==2.6.0+cu124 torchaudio==2.6.0+cu124 torchvision==0.21.0+cu124 --index-url https://download.pytorch.org/whl/cu124
+```
+
+### Package Versions
+
+```text
+torch         2.6.0+cu124
+torchaudio    2.6.0+cu124
+torchvision   0.21.0+cu124
+```
+
+## Directory Hierarchy
+
+```text
+.
+├── feats/
+│   ├── ecappa_feats/
+│   │   ├── v1/
+│   │   └── v3/
+│   └── facenet_feats/
+│       ├── v1/
+│       └── v3/
+├── data/
+│   ├── v1/
+│   └── v3/
+├── csv_files/
+│   ├── comp/
+│   │   ├── train.csv
+│   │   ├── val.csv
+│   │   └── test.csv
+│   └── submission/
+│       └── ... (files created after running submit.py) → to be sumitted on codabench only for v1.
+├── models/
+├── utils/
+├── main.py
+├── submit.py
+└── config.py
+```
 
 ## Reference 
 
