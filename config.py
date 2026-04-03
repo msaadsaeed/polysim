@@ -1,33 +1,30 @@
 from dataclasses import dataclass
-from typing import List
 import logging
 
 @dataclass
 class ExperimentConfig:
-    home_dir = "D:/mavceleb/"
+    home_dir = "/feats"
     seed: int = 1
     device: str = "cuda"
     lr: float = 1e-3
     batch_size: int = 32
     max_epochs: int = 300
     num_workers = 0
-    alpha_list: List[float] = (0.0,)
+    alpha: float = 0.0
     embedding_dim: int = 512
 
-    model_type: str = "FOP"   # "fop" | "multibranch"
+    model_type: str = "fop"   # "fop" | "multibranch"
     fusion: str = "linear"   # "linear" | "gated" | "concat"
     
     loss_face: float = 1.0
-    loss_voice: float = 1.0
+    loss_audio: float = 1.0
     loss_fusion: float = 1.0
 
-    version: str = "v1"
+    version: str = "v3"
     seen_lang: str = "English"
 
-    train_missing_modality = "None" # "face", "voice", None
-    test_missing_modality = "face" # face, voice
+    test_missing_modality = "face" # face, audio
     test_alpha=0.0
-    missing_ratio = 0.0 # 0.0 - 1.0
 
     debug: bool = False
     log_level = logging.DEBUG if debug else logging.INFO

@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 from .model import (
     EmbedBranch,
@@ -12,7 +11,7 @@ class MultiBranchFOP(nn.Module):
     """
     Multi-branch multimodal model with:
     - Face-only head
-    - Voice-only head
+    - Audio-only head
     - Fusion head
 
     Fusion options:
@@ -21,7 +20,7 @@ class MultiBranchFOP(nn.Module):
     - concat
     """
 
-    def __init__(self, config, face_dim, voice_dim):
+    def __init__(self, config, face_dim, audio_dim):
         super().__init__()
 
         self.config = config
@@ -32,13 +31,13 @@ class MultiBranchFOP(nn.Module):
         # Embedding branches
         # -------------------------
         self.face_branch = EmbedBranch(face_dim, emb)
-        self.voice_branch = EmbedBranch(voice_dim, emb)
+        self.audio_branch = EmbedBranch(audio_dim, emb)
 
         # -------------------------
         # Unimodal classifiers
         # -------------------------
         self.face_classifier = nn.Linear(emb, num_classes)
-        self.voice_classifier = nn.Linear(emb, num_classes)
+        self.audio_classifier = nn.Linear(emb, num_classes)
 
         # -------------------------
         # Fusion
@@ -60,34 +59,34 @@ class MultiBranchFOP(nn.Module):
 
         self.fusion_classifier = nn.Linear(fusion_dim, num_classes)
 
-    def forward(self, face, voice):
+    def forward(self, face, audio):
         # -------------------------
         # Embeddings
         # -------------------------
         face_e = self.face_branch(face)
-        voice_e = self.voice_branch(voice)
+        audio_e = self.audio_branch(audio)
 
         # -------------------------
         # Unimodal logits
         # -------------------------
         face_logits = self.face_classifier(face_e)
-        voice_logits = self.voice_classifier(voice_e)
+        audio_logits = self.audio_classifier(audio_e)
 
         # -------------------------
         # Fusion
         # -------------------------
         if self.fusion is None:
-            fused = torch.cat([face_e, voice_e], dim=1)
+            fused = torch.cat([face_e, audio_e], dim=1)
         else:
-            fused, _, _ = self.fusion(face_e, voice_e)
+            fused, _, _ = self.fusion(face_e, audio_e)
 
         fusion_logits = self.fusion_classifier(fused)
 
         return {
             "face_logits": face_logits,
-            "voice_logits": voice_logits,
+            "audio_logits": audio_logits,
             "fusion_logits": fusion_logits,
             "face_embed": face_e,
-            "voice_embed": voice_e,
+            "audio_embed": audio_e,
             "fusion_embed": fused,
         }

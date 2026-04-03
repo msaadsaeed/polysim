@@ -33,7 +33,7 @@ class Evaluator:
         face,
         audio,
         labels,
-        head="fusion",   # "fusion" | "face" | "voice"
+        head="fusion",   # "fusion" | "face" | "audio"
     ):
         """
         Vectorized accuracy from tensors.
@@ -41,7 +41,7 @@ class Evaluator:
         head:
             - "fusion" (default)
             - "face"
-            - "voice"
+            - "audio"
         """
         self.model.eval()
 
@@ -56,8 +56,8 @@ class Evaluator:
                     logits = out["fusion_logits"]
                 elif head == "face":
                     logits = out["face_logits"]
-                elif head == "voice":
-                    logits = out["voice_logits"]
+                elif head == "audio":
+                    logits = out["audio_logits"]
                 else:
                     raise ValueError(f"Unknown head: {head}")
 
@@ -82,7 +82,7 @@ class Evaluator:
         head:
             - "fusion" (default)
             - "face"
-            - "voice" (only valid for MultiBranchFOP)
+            - "audio" (only valid for MultiBranchFOP)
         """
         face, audio, labels = self._get_tensors(dataset)
 

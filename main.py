@@ -13,7 +13,6 @@ from models.fop import FOP
 from models.multibranch import MultiBranchFOP
 
 import os
-import json
 
 def save_checkpoint(model, optimizer, config, epoch, metric_value, save_path):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
@@ -81,7 +80,7 @@ def main():
     logger.info("=== Experiment started ===")
     logger.info(
         "Seed=%d | Device=%s | Model=%s | Fusion=%s | Version=%s | Train_Lang=%s \
-        \n#Classes=%d | UnSeen_Lang=%s | Missing=%s | Ratio=%.2f",
+        \n#Classes=%d | UnSeen_Lang=%s | Alpha=%.3f",
         config.seed,
         config.device,
         config.model_type,
@@ -90,8 +89,7 @@ def main():
         config.seen_lang,
         config.resolved_num_classes,
         config.unseen_lang,
-        config.train_missing_modality,
-        config.missing_ratio,
+        config.alpha,
     )
 
     # --------------------------------------------------
@@ -122,21 +120,23 @@ def main():
         face.shape[1],
     )
 
-    if config.model_type == "FOP":
+    model_type = config.model_type.lower()
+
+    if model_type == "fop":
 
         model = FOP(
             config=config,
             face_dim=face.shape[1],
-            voice_dim=audio.shape[1],
+            audio_dim=audio.shape[1],
         )
 
         # print(model)
     
-    elif config.model_type == "multibranch":
+    elif model_type == "multibranch":
         model = MultiBranchFOP(
             config=config,
             face_dim=face.shape[1],
-            voice_dim=audio.shape[1]
+            audio_dim=audio.shape[1]
         )
     else:
         raise ValueError(f"Unknown model_type: {config.model_type}")
@@ -155,70 +155,70 @@ def main():
     # --------------------------------------------------
     # Training loop
     # --------------------------------------------------
-    for alpha in config.alpha_list:
-        logger.info("=== Training with alpha=%.3f ===", alpha)
+    alpha = config.alpha
+    logger.info("=== Training with alpha=%.3f ===", alpha)
 
-        best_metric = -float("inf")
-        best_epoch = -1
+    best_metric = -float("inf")
+    best_epoch = -1
 
-        save_path = (
-            f"./checkpoints/"
-            f"{config.version}_"
-            f"{config.seen_lang}_"
-            f"alpha{alpha}_"
-            f"best.pt"
-        )
+    save_path = (
+        f"./checkpoints/"
+        f"{config.version}_"
+        f"{config.seen_lang}_"
+        f"alpha{alpha}_"
+        f"best.pt"
+    )
 
-        early_stopper = EarlyStopping(
+    early_stopper = EarlyStopping(
         patience=config.early_stop_patience,
         min_delta=config.early_stop_min_delta,
+    )
+
+    for epoch in range(config.max_epochs):
+        loss = trainer.train_epoch(train_loader, alpha)
+
+        acc_seen = evaluator.accuracy(test_dataset)
+        acc_unseen = evaluator.accuracy(unseen_test_dataset)
+
+        monitor_value = (
+            acc_seen
+            if config.early_stop_metric == "seen"
+            else acc_unseen
         )
 
-        for epoch in range(config.max_epochs):
-            loss = trainer.train_epoch(train_loader, alpha)
+        if monitor_value > best_metric:
+            best_metric = monitor_value
+            best_epoch = epoch
 
-            acc_seen = evaluator.accuracy(test_dataset)
-            acc_unseen = evaluator.accuracy(unseen_test_dataset)
-
-            monitor_value = (
-                acc_seen
-                if config.early_stop_metric == "seen"
-                else acc_unseen
+            save_checkpoint(
+                model=model,
+                optimizer=trainer.opt,
+                config=config,
+                epoch=epoch,
+                metric_value=monitor_value,
+                save_path=save_path,
             )
 
-            if monitor_value > best_metric:
-                best_metric = monitor_value
-                best_epoch = epoch
+        logger.info(
+            "[α=%.3f] Epoch %03d | Loss %.4f | Seen Val %.2f | Unseen Val %.2f",
+            alpha,
+            epoch,
+            loss,
+            acc_seen,
+            acc_unseen,
+        )
 
-                save_checkpoint(
-                    model=model,
-                    optimizer=trainer.opt,
-                    config=config,
-                    epoch=epoch,
-                    metric_value=monitor_value,
-                    save_path=save_path,
+        if config.early_stop:
+            if early_stopper.step(monitor_value):
+                logger.info(
+                    "Early stopping triggered at epoch %d" \
+                    "(best %s accuracy = %0.2f)",
+                    epoch,
+                    config.early_stop_metric,
+                    early_stopper.best_score,
+
                 )
-
-            logger.info(
-                "[α=%.3f] Epoch %03d | Loss %.4f | Seen Val %.2f | Unseen Val %.2f",
-                alpha,
-                epoch,
-                loss,
-                acc_seen,
-                acc_unseen,
-            )
-
-            if config.early_stop:
-                if early_stopper.step(monitor_value):
-                    logger.info(
-                        "Early stopping triggered at epoch %d" \
-                        "(best %s accuracy = %0.2f)",
-                        epoch,
-                        config.early_stop_metric,
-                        early_stopper.best_score,
-
-                    )
-                    break
+                break
 
     logger.info("=== Experiment finished ===")
 

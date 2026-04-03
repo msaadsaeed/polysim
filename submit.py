@@ -8,21 +8,21 @@ from models.fop import FOP
 
 
 def load_npy(csv_file, feats_dir, device):
-    csv_file["ecappa_feats_path"] = csv_file["voices"].apply(
+    csv_file["ecappa_feats_path"] = csv_file["audios"].apply(
         lambda p: os.path.join(feats_dir, p).replace(".wav", ".npy"))
     csv_file["facenet_feats_path"] = csv_file["faces"].apply(
         lambda p: os.path.join(feats_dir, p).replace(".jpg", ".npy"))
     
-    voice_feats = [np.load(i) for i in csv_file["ecappa_feats_path"]]
+    audio_feats = [np.load(i) for i in csv_file["ecappa_feats_path"]]
     face_feats = [np.load(i) for i in csv_file["facenet_feats_path"]]
     
-    voice_feats = np.asarray(voice_feats)
+    audio_feats = np.asarray(audio_feats)
     face_feats = np.asarray(face_feats)
     
-    voice_feats = torch.from_numpy(voice_feats).to(device)
+    audio_feats = torch.from_numpy(audio_feats).to(device)
     face_feats = torch.from_numpy(face_feats).to(device)
     
-    return voice_feats, face_feats
+    return audio_feats, face_feats
 
 def main():
     # --------------------------------------------------
@@ -44,20 +44,20 @@ def main():
     test_csv = pd.read_csv(f"./csv_files/comp/{config.version}_{SPLIT}_{config.seen_lang}.csv")
     unseen_test_csv = pd.read_csv(f"./csv_files/comp/{config.version}_{SPLIT}_{UNSEEN_TEST_LANG}.csv")
     
-    seen_voice_feats, seen_face_feats = load_npy(test_csv, FEATS_DIR, device)
-    unseen_voice_feats, unseen_face_feats = load_npy(unseen_test_csv, FEATS_DIR, device)
+    seen_audio_feats, seen_face_feats = load_npy(test_csv, FEATS_DIR, device)
+    unseen_audio_feats, unseen_face_feats = load_npy(unseen_test_csv, FEATS_DIR, device)
     
     
     # # --------------------------------------------------
     # # Load model
     # # --------------------------------------------------
     face_dim = seen_face_feats.shape[1]
-    audio_dim = seen_voice_feats.shape[1]
+    audio_dim = seen_audio_feats.shape[1]
 
     model = FOP(
         config=config,
         face_dim=face_dim,
-        voice_dim=audio_dim,
+        audio_dim=audio_dim,
     ).to(device)
 
     checkpoint_path = f"./checkpoints/{config.version}_{config.seen_lang}_alpha0.0_best.pt"
@@ -69,25 +69,25 @@ def main():
     # # --------------------------------------------------
     # # P3
     # # --------------------------------------------------
-    _, logits, _, _ = model(seen_face_feats, seen_voice_feats)
+    _, logits, _, _ = model(seen_face_feats, seen_audio_feats)
     p3 = logits.argmax(dim=1).detach().cpu().numpy()
     
     # # --------------------------------------------------
     # # P4
     # # --------------------------------------------------
-    _, logits, _, _ = model(seen_face_feats*0.0, seen_voice_feats)
+    _, logits, _, _ = model(seen_face_feats*0.0, seen_audio_feats)
     p4 = logits.argmax(dim=1).detach().cpu().numpy()
     
     # # --------------------------------------------------
     # # P5
     # # --------------------------------------------------
-    _, logits, _, _ = model(unseen_face_feats, unseen_voice_feats)
+    _, logits, _, _ = model(unseen_face_feats, unseen_audio_feats)
     p5 = logits.argmax(dim=1).detach().cpu().numpy()
     
     # # --------------------------------------------------
     # # P6
     # # --------------------------------------------------
-    _, logits, _, _ = model(unseen_face_feats*0.0, unseen_voice_feats)
+    _, logits, _, _ = model(unseen_face_feats*0.0, unseen_audio_feats)
     p6 = logits.argmax(dim=1).detach().cpu().numpy()
     
     submission = pd.DataFrame()
