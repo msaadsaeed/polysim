@@ -36,11 +36,11 @@ class LinearFusion(nn.Module):
     def __init__(self):
         super().__init__()
         self.w_face = nn.Parameter(torch.rand(1))
-        self.w_voice = nn.Parameter(torch.rand(1))
+        self.w_audio = nn.Parameter(torch.rand(1))
 
-    def forward(self, face, voice):
-        fused = self.w_face * face + self.w_voice * voice
-        return fused, face, voice
+    def forward(self, face, audio):
+        fused = self.w_face * face + self.w_audio * audio
+        return fused, face, audio
 
 
 # --------------------------------------------------
@@ -74,14 +74,14 @@ class GatedFusion(nn.Module):
         )
 
         self.face_proj = nn.Linear(emb_dim, emb_dim)
-        self.voice_proj = nn.Linear(emb_dim, emb_dim)
+        self.audio_proj = nn.Linear(emb_dim, emb_dim)
 
-    def forward(self, face, voice):
-        concat = torch.cat([face, voice], dim=1)
+    def forward(self, face, audio):
+        concat = torch.cat([face, audio], dim=1)
         gate = torch.sigmoid(self.attention(concat))
 
         face_t = torch.tanh(self.face_proj(face))
-        voice_t = torch.tanh(self.voice_proj(voice))
+        audio_t = torch.tanh(self.audio_proj(audio))
 
-        fused = gate * face_t + (1.0 - gate) * voice_t
-        return fused, face_t, voice_t
+        fused = gate * face_t + (1.0 - gate) * audio_t
+        return fused, face_t, audio_t

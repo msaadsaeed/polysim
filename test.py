@@ -11,7 +11,7 @@ def apply_missing(face, audio, pct, modality, seed=0):
     """
     Zero out `pct`% of samples for the given modality.
     """
-    assert modality in ["voice", "face"]
+    assert modality in ["audio", "face"]
 
     N = face.shape[0]
     k = int((pct / 100.0) * N)
@@ -24,7 +24,7 @@ def apply_missing(face, audio, pct, modality, seed=0):
     face_m = face.clone()
     audio_m = audio.clone()
 
-    if modality == "voice":
+    if modality == "audio":
         audio_m[idx] = 0
     else:
         face_m[idx] = 0
@@ -104,7 +104,7 @@ def main():
     model = FOP(
         config=config,
         face_dim=face_dim,
-        voice_dim=audio_dim,
+        audio_dim=audio_dim,
     ).to(device)
 
     checkpoint_path = f"./checkpoints/{config.version}_{config.seen_lang}_alpha{config.test_alpha}_best.pt"

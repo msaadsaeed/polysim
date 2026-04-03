@@ -29,24 +29,6 @@ class Trainer:
             labels = labels.to(self.config.device, non_blocking=True)
 
             # --------------------------------------------------
-            # TRAIN-TIME missing modality (batch-level)
-            # --------------------------------------------------
-            if (
-                self.config.train_missing_modality is not None
-                and self.config.missing_ratio > 0
-            ):
-                B = labels.size(0)
-                k = int(self.config.missing_ratio * B)
-
-                if k > 0:
-                    idx = torch.randperm(B, device=labels.device)[:k]
-
-                    if self.config.train_missing_modality == "audio":
-                        audio[idx] = 0
-                    elif self.config.train_missing_modality == "face":
-                        face[idx] = 0
-
-            # --------------------------------------------------
             # Forward
             # --------------------------------------------------
             out = self.model(face, audio)
@@ -57,12 +39,12 @@ class Trainer:
             if isinstance(out, dict):
                 # -------- MultiBranchFOP --------
                 loss_face = self.ce(out["face_logits"], labels)
-                loss_voice = self.ce(out["voice_logits"], labels)
+                loss_audio = self.ce(out["audio_logits"], labels)
                 loss_fusion = self.ce(out["fusion_logits"], labels)
 
                 loss = (
                     self.config.loss_face * loss_face
-                    + self.config.loss_voice * loss_voice
+                    + self.config.loss_audio * loss_audio
                     + self.config.loss_fusion * loss_fusion
                 )
 
