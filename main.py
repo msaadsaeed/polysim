@@ -95,9 +95,9 @@ def main():
     # --------------------------------------------------
     # CSV paths
     # --------------------------------------------------
-    train_csv = f"./feature_tracker/{config.version}_train_{config.seen_lang}.csv"
-    test_csv = f"./feature_tracker/{config.version}_val_{config.seen_lang}.csv"
-    unseen_csv = f"./feature_tracker/{config.version}_val_{config.unseen_lang}.csv"
+    train_csv = f"./csv_files/comp/{config.version}_train_{config.seen_lang}.csv"
+    test_csv = f"./csv_files/comp/{config.version}_val_{config.seen_lang}.csv"
+    unseen_csv = f"./csv_files/comp/{config.version}_val_{config.unseen_lang}.csv"
 
     logger.info("Train CSV: %s", train_csv)
     logger.info("Test  CSV: %s", test_csv)
