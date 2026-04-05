@@ -1,4 +1,4 @@
-# POLYSIM 2026 Grand Challenge  
+<img width="1184" height="314" alt="image" src="https://github.com/user-attachments/assets/3c472477-db76-40fe-8080-36dabc7203e1" /># POLYSIM 2026 Grand Challenge  
 ## Polyglot Speaker Identification with Missing Modality
 
 <!--## $\textcolor{green}{Accepting \space Submissions!}$ -->
@@ -161,7 +161,7 @@ The goal of evaluation is to study:
 ## Submission
 
 - Use `v1` for training the system; participants can make a validation set from the training set of `v1`.
-- Participants may use `v3`[Raw features](https://drive.google.com/drive/folders/1J500HqsijTm5zrVO2gyfFQ9s0_4c0jdy?usp=sharing) for complete end-to-end running and validation of their systems. It is a similar dataset consisting of `English-German` speakers to simulate `v1`.
+- Participants may use `v3`[Raw features](https://drive.google.com/drive/folders/1J500HqsijTm5zrVO2gyfFQ9s0_4c0jdy?usp=sharing) for complete end-to-end running and validation of their systems. It is a similar dataset to `v1`, consisting of `English-German` speakers to simulate `v1`. We are only providing this dataset so that participants can play around before making submissions on codebench. This is not for submission at codebench.
 - After training their system, participants can run `submit.py`. Participants must submit a ZIP archive containing CSV files, one per language pair. To create the archive, `zip submission.zip *.csv` from within the directory containing the submission files (do not zip the folder itself). Files must be named as follows:
 ```
 - submission_v1_<phase>_English_English.csv
