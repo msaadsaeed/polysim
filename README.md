@@ -1,4 +1,3 @@
-<img width="1184" height="314" alt="image" src="https://github.com/user-attachments/assets/3c472477-db76-40fe-8080-36dabc7203e1" /># POLYSIM 2026 Grand Challenge  
 ## Polyglot Speaker Identification with Missing Modality
 
 <!--## $\textcolor{green}{Accepting \space Submissions!}$ -->
