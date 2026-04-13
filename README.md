@@ -3,9 +3,9 @@
 <!--## $\textcolor{green}{Accepting \space Submissions!}$ -->
 
 [Challenge Webpage](https://mmosc.github.io/fame2027.github.io/index.html#home)  
-[Evaluation Plan](https://arxiv.org/abs/2603.24569)
-[Registration](https://docs.google.com/forms/d/e/1FAIpQLSde1K3fV89P_KCHE8RGM8XY0znP8BY44JQP8AEf9Idi-jdWdg/viewform)
-[Leader Board](https://www.codabench.org/competitions/11283/)
+[Evaluation Plan](https://arxiv.org/abs/2603.24569) 
+[Registration](https://docs.google.com/forms/d/e/1FAIpQLSde1K3fV89P_KCHE8RGM8XY0znP8BY44JQP8AEf9Idi-jdWdg/viewform) 
+[Leader Board](https://www.codabench.org/competitions/11283/) 
 
 ---
 
