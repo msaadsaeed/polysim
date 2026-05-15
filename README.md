@@ -133,7 +133,7 @@ The dataset MavCeleb consists of **paired speech audio and face images/video fra
 ### Data Splits
 - Training set - [Raw data](https://drive.google.com/file/d/1bRFbL9jOcmauEMJlEN_-4DvbpL2SFwlz/view?usp=sharing), [features](https://drive.google.com/file/d/11gjdlJgRxWcoNU9h-xlD8W0171Q6nvAA/view?usp=sharing), [CSV file](https://drive.google.com/file/d/1V_Wctz02J1wA47rTAZ3uIXiCkw9rYDQd/view?usp=sharing) 
 - Dev set  (labels hidden) - [Raw data](https://drive.google.com/file/d/1JRkgFKUo0hVdnPaT8JsrSn06C1hl8g89/view?usp=sharing), [features](https://drive.google.com/file/d/19smDBY2fcvR-vXML2UjGrWc0XyfDO3-l/view?usp=sharing), [CSV file](https://drive.google.com/file/d/1V_Wctz02J1wA47rTAZ3uIXiCkw9rYDQd/view?usp=sharing)
-- Test set (labels hidden) - ![Coming Soon](https://img.shields.io/badge/status-coming%20soon-red)
+- **Test set (labels hidden) - [Raw data](https://drive.google.com/file/d/1jj7zwU1j1qYCjr2Awl9Gp1fvtpWxGuP4/view?usp=sharing), [features](https://drive.google.com/file/d/1CIndslpYn7pbhYPZnDAXy7tELJghK_1F/view?usp=sharing), [CSV file](https://drive.google.com/file/d/12bewwdD29Irr8X8max0d9Ddc5HRpQGv9/view?usp=sharing)**
 
 ### Missing Modality Setup
 - Missing modality occurs **only at test time**
